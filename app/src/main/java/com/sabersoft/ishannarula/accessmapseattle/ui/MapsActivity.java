@@ -89,9 +89,16 @@ public class MapsActivity extends FragmentActivity {
         LatLng initialCenter = new LatLng(47.650045, -122.301186);
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(initialCenter, 14));
 
+        progress = new ProgressDialog(MapsActivity.this);
+        progress.setTitle("Downloading content");
+        progress.setMessage("Adding overlays to map");
+        progress.show();
+
         getData(sidewalkURL);
         getData(curbURL);
         getData(permitURL);
+
+        progress.dismiss();
         
     }
 
