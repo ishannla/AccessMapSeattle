@@ -33,10 +33,11 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
+
 public class MapsActivity extends FragmentActivity {
 
     private GoogleMap map;
-    private ProgressDialog progress;
+    ProgressDialog progress;
 
     private String sidewalkURL;
     private String curbURL;
@@ -52,9 +53,15 @@ public class MapsActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        sidewalkURL = "http://hackcessibleapi.cs.washington.edu/sidewalks.geojson";
+        sidewalkURL = "http://hackcessibleapi.cs.washington.edu/sidewalks.geojson?bbox=-122.315915,47.661820,-122.301409,47.674710";
         curbURL = "http://hackcessibleapi.cs.washington.edu/curbs.geojson";
         permitURL = "http://hackcessibleapi.cs.washington.edu/permits.geojson";
+
+        progress = new ProgressDialog(MapsActivity.this);
+        progress.setCancelable(false);
+        progress.setTitle("Downloading content");
+        progress.setMessage("Adding overlays to map");
+        progress.show();
 
         //CustomDialog dialog = new CustomDialog("Debug1", "Debug1");
         //dialog.show(getFragmentManager(), "debug");
@@ -89,16 +96,12 @@ public class MapsActivity extends FragmentActivity {
         LatLng initialCenter = new LatLng(47.650045, -122.301186);
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(initialCenter, 14));
 
-        progress = new ProgressDialog(MapsActivity.this);
-        progress.setTitle("Downloading content");
-        progress.setMessage("Adding overlays to map");
-        progress.show();
 
         getData(sidewalkURL);
-        getData(curbURL);
-        getData(permitURL);
+ //     getData(curbURL);
+ //     getData(permitURL);
 
-        progress.dismiss();
+
         
     }
 
@@ -139,9 +142,15 @@ public class MapsActivity extends FragmentActivity {
                             Log.d("MapsActivity", dataJSON);
                             parseData(dataJSON, finalSwitcher);
 
+                            final int var1 = sidewalks.length;
+                            final int var2 = 25;
+
                             runOnUiThread(new Runnable() {
                                 @Override
-                                public void run() {updateMapOverlay(finalSwitcher);
+                                public void run() {
+                                    updateMapOverlay(finalSwitcher);
+                                    progress.dismiss();
+                                    Toast.makeText(MapsActivity.this, String.valueOf(var1), Toast.LENGTH_LONG).show();
                                 }
                             });
                         }
@@ -158,6 +167,8 @@ public class MapsActivity extends FragmentActivity {
             });
 
         }
+
+
     }
 
 
@@ -228,9 +239,9 @@ public class MapsActivity extends FragmentActivity {
                 LatLng start = sidewalk.getStartPoint();
                 LatLng end = sidewalk.getEndPoint();
 
-                Polyline line = map.addPolyline(new PolylineOptions()
+                map.addPolyline(new PolylineOptions()
                         .add(start, end)
-                        .width(5)
+                        .width(3)
                         .color(Color.RED));
 
             }
